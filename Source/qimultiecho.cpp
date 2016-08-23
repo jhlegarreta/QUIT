@@ -10,7 +10,6 @@
  *
  */
 
-#include <getopt.h>
 #include <iostream>
 #include <Eigen/Core>
 #include <unsupported/Eigen/LevenbergMarquardt>
@@ -18,6 +17,7 @@
 
 #include "QI/Types.h"
 #include "QI/Util.h"
+#include "QI/Option.h"
 #include "QI/Sequences/SpinEcho.h"
 #include "Filters/ApplyAlgorithmFilter.h"
 #include "Filters/ReorderImageFilter.h"
@@ -26,50 +26,6 @@
 
 using namespace std;
 using namespace Eigen;
-
-const string usage {
-"Usage is: multiecho [options] input_file \n\
-\
-Options:\n\
-    --help, -h        : Print this message\n\
-    --verbose, -v     : Print more information\n\
-    --no-prompt, -n   : Suppress input prompts\n\
-    --out, -o path    : Add a prefix to the output filenames\n\
-    --mask, -m file   : Mask input with specified file\n\
-    --star, -S        : Data is T2*, not T2\n\
-    --thresh, -t n    : Threshold maps at PD < n\n\
-    --clamp, -c n     : Clamp T2 between 0 and n\n\
-    --reorder, -R     : Data is ordered by timepoint, then echo\n\
-    --algo, -a l      : LLS algorithm (default)\n\
-               a      : ARLO algorithm\n\
-               n      : Non-linear (Levenberg-Marquardt)\n\
-    --its, -i N       : Max iterations for non-linear (default 10)\n\
-    --resids, -r      : Write out per flip-angle residuals\n\
-    --threads, -T N   : Use N threads (default=hardware limit)\n"
-};
-
-static int NE = 0, nIterations = 10;
-static bool verbose = false, prompt = true, all_residuals = false, weightedSum = false, reorder = false;
-static string outPrefix, suffix;
-static double thresh = -numeric_limits<double>::infinity();
-static double clamp_lo = -numeric_limits<double>::infinity(), clamp_hi = numeric_limits<double>::infinity();
-static struct option long_options[] =
-{
-    {"help", no_argument, 0, 'h'},
-    {"verbose", no_argument, 0, 'v'},
-    {"no-prompt", no_argument, 0, 'n'},
-    {"out", required_argument, 0, 'o'},
-    {"mask", required_argument, 0, 'm'},
-    {"star", no_argument, 0, 'S'},
-    {"thresh", required_argument, 0, 't'},
-    {"clamp", required_argument, 0, 'c'},
-    {"reorder", no_argument, 0, 'R'},
-    {"algo", required_argument, 0, 'a'},
-    {"threads", required_argument, 0, 'T'},
-    {"resids", no_argument, 0, 'r'},
-    {0, 0, 0, 0}
-};
-static const char *short_opts = "hvnm:Se:o:b:t:c:Ra:T:r";
 
 /*
  * Base class for the 3 different algorithms
@@ -186,7 +142,7 @@ public:
         RelaxFunctor f(m_sequence, data);
         NumericalDiff<RelaxFunctor> nDiff(f);
         LevenbergMarquardt<NumericalDiff<RelaxFunctor>> lm(nDiff);
-        lm.setMaxfev(nIterations * (m_sequence->size() + 1));
+        lm.setMaxfev(m_iterations * (m_sequence->size() + 1));
         // Just PD & T2 for now
         // Basic guess of T2=50ms
         VectorXd p(2); p << data(0), 0.05;
@@ -201,73 +157,50 @@ public:
 //******************************************************************************
 int main(int argc, char **argv) {
     Eigen::initParallel();
-    QI::VolumeF::Pointer mask, B1, f0 = ITK_NULLPTR;
-    shared_ptr<RelaxAlgo> algo = make_shared<LogLinAlgo>();
-    int indexptr = 0, c;
-    while ((c = getopt_long(argc, argv, short_opts, long_options, &indexptr)) != -1) {
-        switch (c) {
-            case 'v': verbose = true; break;
-            case 'n': prompt = false; break;
-            case 'm':
-                cout << "Reading mask file " << optarg << endl;
-                mask = QI::ReadImage(optarg);
-                break;
-            case 'o':
-                outPrefix = optarg;
-                cout << "Output prefix will be: " << outPrefix << endl;
-                break;
-            case 'S': suffix = "star"; break;
-            case 't': thresh = atof(optarg); break;
-            case 'c':
-                clamp_lo = 0;
-                clamp_hi = atof(optarg);
-                break;
-            case 'R': reorder = true; break;
-            case 'a':
-                switch (*optarg) {
-                    case 'l': algo = make_shared<LogLinAlgo>(); if (verbose) cout << "LogLin algorithm selected." << endl; break;
-                    case 'a': algo = make_shared<ARLOAlgo>(); if (verbose) cout << "ARLO algorithm selected." << endl; break;
-                    case 'n': algo = make_shared<NonLinAlgo>(); if (verbose) cout << "Non-linear algorithm (Levenberg Marquardt) selected." << endl; break;
-                    default:
-                        cout << "Unknown algorithm type " << optarg << endl;
-                        return EXIT_FAILURE;
-                        break;
-                } break;
-            case 'T': itk::MultiThreader::SetGlobalMaximumNumberOfThreads(atoi(optarg)); break;
-            case 'r': all_residuals = true; break;
-            case 'h':
-                cout << QI::GetVersion() << endl << usage << endl;
-                return EXIT_SUCCESS;
-            case '?': // getopt will print an error message
-                return EXIT_FAILURE;
-            default:
-                cout << "Unhandled option " << string(1, c) << endl;
-                return EXIT_FAILURE;
-        }
-    }
-    if ((argc - optind) != 1) {
-        cout << "Incorrect number of arguments." << endl << usage << endl;
+    QI::OptionList opts("Usage is: qimultiecho [options] input_file");
+    QI::Switch all_residuals('r',"resids","Write out per flip-angle residuals", opts);
+    QI::Option<int> num_threads(4,'T',"threads","Use N threads (default=4, 0=hardware limit)", opts);
+    QI::Option<int> its(15,'i',"its","Max iterations for NLLS (default 15)", opts);
+    QI::Switch reorder('R',"reorder","Re-order data", opts);
+    QI::Option<float> clamp(std::numeric_limits<float>::infinity(),'c',"clamp","Clamp tau between 0 and value", opts);
+    QI::ImageOption<QI::VolumeF> mask('m', "mask", "Mask input with specified file", opts);
+    QI::ImageOption<QI::VolumeF> B1('b', "B1", "B1 Map file (ratio)", opts);
+    QI::Switch flex('f',"flex","Use flexible TEs", opts);
+    QI::EnumOption algorithm("lan",'l','a',"algo","Choose algorithm (l/a/n)", opts);
+    QI::Option<std::string> outPrefix("", 'o', "out","Add a prefix to output filenames", opts);
+    QI::Switch suppress('n',"no-prompt","Suppress input prompts", opts);
+    QI::Switch verbose('v',"verbose","Print more information", opts);
+    QI::Help help(opts);
+    std::vector<std::string> nonopts = opts.parse(argc, argv);
+    if (nonopts.size() != 1) {
+        std::cerr << opts << std::endl;
+        std::cerr << "No input filename specified." << std::endl;
         return EXIT_FAILURE;
     }
-    if (verbose) {
-        cout << "Ouput prefix will be: " << outPrefix << endl;
-        cout << "Clamp: " << clamp_lo << " " << clamp_hi << endl;
-        cout << "Thresh: " << thresh << endl;
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(*num_threads);
+    shared_ptr<RelaxAlgo> algo;
+    switch (*algorithm) {
+        case 'l': algo = make_shared<LogLinAlgo>(); if (*verbose) cout << "LogLin algorithm selected." << endl; break;
+        case 'a': algo = make_shared<ARLOAlgo>(); if (*verbose) cout << "ARLO algorithm selected." << endl; break;
+        case 'n': algo = make_shared<NonLinAlgo>(); if (*verbose) cout << "Non-linear algorithm (Levenberg Marquardt) selected." << endl; break;
     }
-    // Gather input data
-    auto multiecho = make_shared<QI::MultiEcho>(cin, prompt);
+    shared_ptr<QI::MultiEcho> multiecho;
+    if (*flex)
+        multiecho = make_shared<QI::MultiEchoFlex>(cin, !*suppress);
+    else
+        multiecho = make_shared<QI::MultiEcho>(cin, !*suppress);
     algo->setSequence(multiecho);
     auto apply = itk::ApplyAlgorithmFilter<RelaxAlgo>::New();
-    if (mask)
-        apply->SetMask(mask);
-    if (verbose) cout << "Opening input file: " << argv[optind] << endl;
+    apply->SetAlgorithm(algo);
+    apply->SetMask(*mask);
+    if (*verbose) cout << "Opening input file: " << nonopts[0] << endl;
     auto inputFile = itk::ImageFileReader<QI::SeriesF>::New();
-    inputFile->SetFileName(argv[optind]);
+    inputFile->SetFileName(nonopts[0]);
     inputFile->Update(); // Need to know the length of the vector for re-ordering
     size_t nVols = inputFile->GetOutput()->GetLargestPossibleRegion().GetSize()[3] / multiecho->size();
     auto inputData = QI::ReorderSeriesF::New();
     inputData->SetInput(inputFile->GetOutput());
-    if (reorder)
+    if (*reorder)
         inputData->SetStride(nVols);
     inputData->Update();
 
@@ -277,7 +210,7 @@ int main(int argc, char **argv) {
     layout[0] = layout[1] = layout[2] = 1; layout[3] = nVols;
     PDoutput->SetLayout(layout);
     T2output->SetLayout(layout);
-    if (verbose) cout << "Processing" << endl;
+    if (*verbose) cout << "Processing" << endl;
     auto inputVector = QI::SeriesToVectorF::New();
     inputVector->SetInput(inputData->GetOutput());
     inputVector->SetBlockSize(multiecho->size());
@@ -297,12 +230,12 @@ int main(int argc, char **argv) {
         PDoutput->SetInput(i, PDimgs.at(i));
         T2output->SetInput(i, T2imgs.at(i));
     }
-    if (verbose) cout << "Writing output" << endl;
+    if (*verbose) cout << "Writing output with prefix: " << *outPrefix << endl;
     PDoutput->UpdateLargestPossibleRegion();
     T2output->UpdateLargestPossibleRegion();
-    outPrefix = outPrefix + "ME_";
-    QI::WriteImage(PDoutput->GetOutput(), outPrefix + "PD" + suffix + QI::OutExt());
-    QI::WriteImage(T2output->GetOutput(), outPrefix + "T2" + suffix + QI::OutExt());
+    *outPrefix = *outPrefix + "ME_";
+    QI::WriteImage(PDoutput->GetOutput(), *outPrefix + "M0" + QI::OutExt());
+    QI::WriteImage(T2output->GetOutput(), *outPrefix + "T" + QI::OutExt());
     //QI::writeResiduals(apply->GetResidOutput(), outPrefix, all_residuals);
 
     return EXIT_SUCCESS;

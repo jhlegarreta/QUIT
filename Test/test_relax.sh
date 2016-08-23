@@ -45,9 +45,9 @@ run_test "SPINECHO_LOGLIN" $QUITDIR/qimultiecho $SPIN_FILE -n -v -al -oLL_     <
 run_test "SPINECHO_LEVMAR" $QUITDIR/qimultiecho $SPIN_FILE -n -v -an -oLEVMAR_ < multiecho.in
 run_test "SPINECHO_ARLO"   $QUITDIR/qimultiecho $SPIN_FILE -n -v -aa -oARLO_   < multiecho.in
 
-compare_test "LOGLIN" T2.nii LL_ME_T2.nii     $NOISE 50
-compare_test "LEVMAR" T2.nii LEVMAR_ME_T2.nii $NOISE 50
-compare_test "ARLO"   T2.nii ARLO_ME_T2.nii   $NOISE 50
+compare_test "LOGLIN" T2.nii LL_ME_T.nii     $NOISE 50
+compare_test "LEVMAR" T2.nii LEVMAR_ME_T.nii $NOISE 50
+compare_test "ARLO"   T2.nii ARLO_ME_T.nii   $NOISE 50
 
 cd ..
 SILENCE_TESTS="0"

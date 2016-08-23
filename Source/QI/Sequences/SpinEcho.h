@@ -34,6 +34,13 @@ class MultiEcho : public SequenceBase {
         void setTE(const Eigen::ArrayXd &TE) { m_TE = TE; }
 };
 
+class MultiEchoFlex : public MultiEcho {
+public:
+    MultiEchoFlex(std::istream &istr, const bool prompt);
+    std::string name() const override { return "MultiEchoFlex"; }
+    void write(std::ostream &os) const override;
+};
+
 } // End namespace QI
 
 #endif // SEQUENCES_SEQUENCE_H

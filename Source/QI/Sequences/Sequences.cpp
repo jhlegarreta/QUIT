@@ -41,6 +41,8 @@ std::shared_ptr<SequenceBase> ReadSequence(std::istream &istr, const bool prompt
         return std::make_shared<AFI>(istr, prompt);
     } else if (type == "SPINECHO") {
         return std::make_shared<MultiEcho>(istr, prompt);
+    } else if (type == "SPINECHOFLEX") {
+        return std::make_shared<MultiEchoFlex>(istr, prompt);
     } else {
         QI_EXCEPTION("Unknown sequence type: " << type);
     }

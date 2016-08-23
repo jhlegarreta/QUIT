@@ -52,4 +52,17 @@ void MultiEcho::write(ostream &os) const {
 	os << "TE: " << m_TE.transpose() << endl;
 }
 
+MultiEchoFlex::MultiEchoFlex(std::istream& istr, const bool prompt) : MultiEcho() {
+    if (prompt) cout << "Enter TR: " << flush;
+    QI::Read(istr, m_TR);
+    if (prompt) cout << "Enter echo-times: " << flush;
+    QI::ReadArray(istr, m_TE);
+    m_ESP = 0;
+}
+
+void MultiEchoFlex::write(ostream &os) const {
+    os << "MultiEchoFlex" << endl;
+    os << "TE: " << m_TE.transpose() << endl;
+}
+
 } // End namespace QI
