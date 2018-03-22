@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Utilities - QUIT</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">QUIT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../Relaxometry/">Relaxometry</a>
+</li>
+                            
+<li >
+    <a href="../SSFP/">SSFP</a>
+</li>
+                            
+<li >
+    <a href="../MT/">Magnetization Transfer</a>
+</li>
+                            
+<li >
+    <a href="../Perfusion/">Perfusion</a>
+</li>
+                            
+<li >
+    <a href="../Susceptibility/">Susceptibility</a>
+</li>
+                            
+<li >
+    <a href="../Stats/">Statistics</a>
+</li>
+                            
+<li class="active">
+    <a href="./">Utilities</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../Developer/">Developer</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../Stats/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../Developer/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/spinicist/quit/edit/master/docs/Utilities.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#utilities">Utilities</a></li>
+            <li><a href="#qi_coil_combine">qi_coil_combine</a></li>
+            <li><a href="#qi_rfprofile">qi_rfprofile</a></li>
+            <li><a href="#qiaffine">qiaffine</a></li>
+            <li><a href="#qicomplex">qicomplex</a></li>
+            <li><a href="#qihdr">qihdr</a></li>
+            <li><a href="#qikfilter">qikfilter</a></li>
+            <li><a href="#qimask">qimask</a></li>
+            <li><a href="#qipolyfitqipolyimg">qipolyfit/qipolyimg</a></li>
+            <li><a href="#qisplitsubjects">qisplitsubjects</a></li>
+            <li><a href="#qidiff">qidiff</a></li>
+            <li><a href="#qinewimage">qinewimage</a></li>
+            <li><a href="#qisignal">qisignal</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="utilities">Utilities</h1>
+<p>QUIT contains a number of utilities. Note that these are actually compiled in two separate modules - <code>CoreProgs</code> contains the bare minimum of programs for the QUIT tests to run, while the actual <code>Utils</code> modules contains a larger number of useful tools for neuro-imaging pipelines. Their documentation is combined here.</p>
+<ul>
+<li><a href="#qi_coil_combine">qi_coil_combine</a></li>
+<li><a href="#qi_rfprofile">qi_rfprofile</a></li>
+<li><a href="#qiaffine">qiaffine</a></li>
+<li><a href="#qicomplex">qicomplex</a></li>
+<li><a href="#qihdr">qihdr</a></li>
+<li><a href="#qikfilter">qikfilter</a></li>
+<li><a href="#qimask">qimask</a></li>
+<li><a href="#qipolyfit/qipolyimg">qipolyfit/qipolyimg</a></li>
+<li><a href="#qireorder">qireorder</a></li>
+<li><a href="#qisplitsubjects">qisplitsubjects</a></li>
+<li><a href="#qidiff">qidiff</a></li>
+<li><a href="#qinewimage">qinewimage</a></li>
+<li><a href="#qisignal">qisignal</a></li>
+</ul>
+<h2 id="qi_coil_combine">qi_coil_combine</h2>
+<p>The program implements both the COMPOSER and Hammond methods for coil combination. For COMPOSER, a wrapper script that includes registration and resampling of low resolution reference data to the image data can be found in <code>qi_composer.sh</code>.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_coil_combine multicoil_data.nii.gz --composer=composer_reference.nii.gz
+</code></pre>
+
+<p>Both the input multi-coil file and the reference file must be complex valued. Does not read input from <code>stdin</code>. If a COMPOSER reference file is not specifed, then the Hammond coil combination method is used.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>input_combined.nii.gz</code> - The combined complex-valued image.</li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--composer, -c</code></p>
+<p>Use the COMPOSER method. The reference file should be from a short-echo time reference scan, e.g. UTE or ZTE. If</p>
+</li>
+<li>
+<p><code>--coils, -C</code></p>
+<p>If your input data is a timeseries consisting of multiple volumes, then use this option to specify the number of coils used in the acquisition. Must match the number of volumes in the reference image. Does not currently work with the Hammond method.</p>
+</li>
+<li>
+<p><code>--region, -r</code></p>
+<p>The reference region for the Hammond method. Default is an 8x8x8 cube in the center of the acquisition volume.</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.26093">COMPOSER</a></li>
+<li><a href="http://dx.doi.org/10.1016/j.jneumeth.2013.09.021">Hammond Method</a></li>
+</ul>
+<h2 id="qi_rfprofile">qi_rfprofile</h2>
+<p>This utility takes a B1+ (transmit field inhomogeneity) map, and reads an excitation slab profile from <code>stdin</code>. The two are multiplied together along the slab direction (assumed to be Z), to produce a relative flip-angle or B1 map.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qihdr b1plus_map.nii.gz output_b1_map.nii.gz &lt; input.txt
+</code></pre>
+
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+    &quot;rf_pos&quot; : [ -5, 0, 5],
+    &quot;rf_vals&quot; : [[0, 1, 0],
+                 [0, 2, 0]]
+}
+</code></pre>
+
+<p><code>rf_pos</code> specifies the positions that values of the RF slab have been calculated at, which are specified in <code>rf_vals</code>. Note that <code>rf_vals</code> is an array of arrays - this allows <code>qi_rfprofile</code> to calculate profiles for multiple flip-angles in a single pass. The units for <code>rf_pos</code> are the same as image spacing in the header (usually mm). <code>rf_vals</code> is a unitless fraction, relative to the nominal flip-angle.</p>
+<p>These values should be generated with a Bloch simulation. Internally, they are used to create a spline to represent the slab profile. This is then interpolated to each voxel's Z position, and the value multiplied by the input B1+ value at that voxel to produce the output.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li>output_b1map.nii.gz - The relative flip-angle/B1 map</li>
+</ul>
+<h2 id="qiaffine">qiaffine</h2>
+<p>This tool applies simple affine transformations to the header data of an image, i.e. rotations or scalings. It was written because of the inconsistent definitions of co-ordinate systems in pre-clinical imaging. Non-primate mammals are usually scanned prone instead of supine, and are quadrupeds instead of bipeds. This means the definitions of superior/inferior and anterior/posterior are different than in clinical scanning. However, several pre-clinical atlases, e.g. Dorr et al, rotate their data so that the clinical conventions apply. It is hence useful as a pre-processing step to adopt the same co-ordinate system. In addition, packages such as SPM or ANTs have several hard-coded assumptions about their input images that are only appropriate for human brains. It can hence be useful to scale up rodent brains by a factor of 10 so that they have roughly human dimensions.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qiaffine input_image.nii.gz --scale=10.0 --rotX=90
+</code></pre>
+
+<p>If no output image is specified, the output will be written back to the input filename.</p>
+<p><strong>Common Options</strong></p>
+<ul>
+<li>
+<p><code>--scale, -s</code></p>
+<p>Multiply the voxel spacing by a constant factor.</p>
+</li>
+<li>
+<p><code>--rotX, --rotY, --rotZ</code></p>
+<p>Rotate about the specified axis by the specified number of degrees. Note that currently, each rotation can only be specified once and the order will always be X, Y, then Z.</p>
+</li>
+<li>
+<p><code>--offX, --offY, --offZ</code></p>
+<p>Add the specified offset to the origin.</p>
+</li>
+<li>
+<p><code>--center, -c</code></p>
+<p>Set the image origin to be the Center of Gravity of the image.</p>
+</li>
+</ul>
+<h2 id="qicomplex">qicomplex</h2>
+<p>Manipulate complex/real/imaginary/magnitude/phase data.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qicomplex -m input_magnitude.nii.gz -p input_phase.nii.gz -R output_real.nii.gz -I output_imaginary.nii.gz
+</code></pre>
+
+<p>Lower case arguments <code>--mag, -m, --pha, -p, --real, -r, --imag, -i, --complex, -x</code> are inputs (of which it is only valid to specify certain combinations, complex OR magnitude/phase OR real/imaginary).</p>
+<p>Upper case arguments <code>--MAG, -M, --PHA, -P, --REAL, -R, --IMAG, -I, --COMPLEX, -X</code> are outputs, any or all of which can be specified.</p>
+<p>An additional input argument, <code>--realimag</code> is for Bruker "complex" data, which consists of all real volumes followed by all imaginary volumes, instead of a true complex datatype.</p>
+<p>The <code>--fixge</code> argument fixes the lack of an FFT shift in the slab direction on GE data by multiplying alternate slices by -1. <code>--negate</code> multiplies the entire volume by -1. <code>--double</code> reads and writes double precision data instead of floats.</p>
+<h2 id="qihdr">qihdr</h2>
+<p>Prints the header of input files as seen by ITK to <code>stdout</code>. Can extract single header fields or print the entirety.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qihdr input_file1.nii.gz input_file2.nii.gz --verbose
+</code></pre>
+
+<p>Multiple files can be queried at the same time. The <code>--verbose</code> flag will make sure you can tell which is which.</p>
+<p><strong>Important Options</strong></p>
+<p>If any of the following options are specified, then only those fields will be printed instead of the full header. This is useful if you want to use a header field in a script:
+<em> <code>--origin, -o</code>
+</em> <code>--spacing, -S</code> - The voxel spacing
+<em> <code>--size, -s</code> - The matrix size
+</em> <code>--voxvol, -v</code> - The volume of one voxel</p>
+<p>Another useful option is <code>--meta, -m</code>. This will let you query specific image meta-data from the header. You must know the exact name of the meta-data field you wish to obtain.</p>
+<h2 id="qikfilter">qikfilter</h2>
+<p>MR images often required smoothing or filtering. While this is best done during reconstruction, sometimes it is required as a post-processing step. Instead of filtering by performing a convolution in image space, this tool takes the Fourier Transfrom of input volumes, multiplies k-Space by the specified filter, and transforms back.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qikfilter input_file.nii.gz --filter=Gauss,0.5
+</code></pre>
+
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>input_file_filtered.nii.gz</code></li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--filter,-f</code></p>
+<p>Specify the filter to use. For all filters below the value <script type="math/tex">r</script> is the fractional distance from k-Space center, i.e. <script type="math/tex">r = \sqrt(((k_x / s_x)^2 + (k_y / s_y)^2 + (k_z / s_z)^2) / 3)</script>. Valid filters are:</p>
+<ul>
+<li>
+<p><code>Tukey,a,q</code></p>
+<p>A Tukey filter with parameters <script type="math/tex">a</script> and <script type="math/tex">q</script>. Filter value is 1 for <script type="math/tex">r < (1 - a)</script>, else the value is <script type="math/tex; mode=display">\frac{(1+q)+(1-q)\cos(\pi\frac{r - (1 - a)}{a})}{2}</script>
+</p>
+</li>
+<li>
+<p><code>Hamming,a,b</code></p>
+<p>A Hamming filter, parameters <script type="math/tex">a</script> and <script type="math/tex">b</script>, value is <script type="math/tex; mode=display">a - b\cos(\pi(1+r))</script>
+</p>
+</li>
+<li>
+<p><code>Gauss,w</code> or <code>Gauss,x,y,z</code></p>
+<p>A Gaussian filter with FWHM specified either isotropically or for each direction independantly.</p>
+</li>
+<li>
+<p><code>Blackman</code> or <code>Blackman,a</code></p>
+<p>A Blackman filter, either with the default parameter of <script type="math/tex">\alpha=0.16</script> or specified <script type="math/tex">\alpha</script>. Refer to Wikipedia for the relevant equation.</p>
+</li>
+<li>
+<p><code>Rectangle,Dim,Width,Inside,Outside</code></p>
+<p>A rectangular or top-hat filter along the specified dimension (must be 0, 1 or 2).</p>
+</li>
+</ul>
+<p>If multiple filters are specified, they are concatenated, <em>unless</em> the <code>--filter_per_volume</code> option is specified.</p>
+</li>
+<li>
+<p><code>--filter_per_volume</code></p>
+<p>For multiple flip-angle data, the difference in contrast between flip-angles can lead to different amounts of ringing. Hence you may wish to filter volumes with more ringing more heavily. If this option is specified, the number of filters on the command line must match the number of volumes in the input file, and they will be processed in order.</p>
+</li>
+<li>
+<p><code>--complex_in</code> and <code>--complex_out</code></p>
+<p>Read / write complex data.</p>
+</li>
+</ul>
+<h2 id="qimask">qimask</h2>
+<p>Implements several different masking strategies. For human data, BET, antsBrainExtraction of 3dSkullStrip are likely better ideas. For pre-clinical data, the strategies below can provide a reasonable mask with some tweaking. There are potentially three stages to generating the mask:</p>
+<p>1 - Binary thresholding. If lower or upper thresholds are specified, these are used to separate the image into foreground and background. If neither are specified, then Otsu's method is used to automatically estimate a reasonable threshold value.
+2 - (Optional) Run the RATs algorithm
+3 - (Optional) Hole-filling</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qimask input_image.nii.gz --lower=10 --rats=1200 --fillh=1
+</code></pre>
+
+<p>In this case an intensity value of 10 will be used as the threshold, RATs will be run with a target volume of 1200 mm^3, and then holes with a radius of 1 voxel will be filled.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>input_image_mask.nii.gz</code></li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--lower,-l</code>/<code>--upper,-u</code></p>
+<p>Specify lower and/or upper intensity thresholds. Values below/above these values are set to 0, those inside are set 1. If this option is not specified, Otsu's method will be used to generate a threshold value. If no thresholding is desired, specify <code>--lower=0</code>.</p>
+</li>
+<li>
+<p><code>--rats, -r</code></p>
+<p>Use the RATs algorithm to remove non-brain tissue. The RATs algorithm uses erode &amp; dilate filters of progressively increasing size until the largest connected component falls below a target size. For rats, target values of around 1000 mm^3 are reasonable.</p>
+</li>
+<li>
+<p><code>--fillh, -F</code></p>
+<p>Fill holes in the mask up to radius N voxels.</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.26093">RATs algorithm</a></li>
+</ul>
+<h2 id="qipolyfitqipolyimg">qipolyfit/qipolyimg</h2>
+<p>These tools work together to fit Nth order polynomials to images. This is typically used for smoothing a B1 field.</p>
+<p><code>qipolyfit</code> will output the polynomial co-efficients and origin to <code>stdout</code>. <code>qipolyimg</code> can then read these to generate the polyimage image, using a different image as the reference space. In this way the polynomial image can be created without having to use upsampling.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qipolyfit noisy_b1_map.nii.gz --mask=brain_mask.nii.gz --order=8 | qipolyimg hires_t1_image.nii.gz hires_smooth_b1_map.nii.gz --order=8
+</code></pre>
+
+<p>With the above command-line the output of <code>qipolyfit</code> is piped directly to the output of <code>qipolyimg</code>. You can instead redirect it to a file with <code>&gt;</code> and read it in separately. The <code>--order</code> argument must match between the two commands.</p>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--order, -o</code></p>
+<p>The order of the fitted polynomial. Default is 2 (quadratic)</p>
+</li>
+<li>
+<p><code>--mask, -m</code></p>
+<p>Only fit the data within a mask. This is usually the brain or only white-matter.</p>
+</li>
+<li>
+<p><code>--robust</code> (<code>qipolyimg</code> only)</p>
+<p>Use Robust Polynomial Fitting with Huber weights. There is a good discussion of this topic in the Matlab help files.</p>
+</li>
+</ul>
+<h2 id="qisplitsubjects">qisplitsubjects</h2>
+<p>This program is deprecated. It was used to separate ex-vivo images containing multiple subjects into distinct images.</p>
+<h2 id="qidiff">qidiff</h2>
+<p>Calculates the mean square difference between two images and checks if it is below a tolerance value. Used in the QUIT tests to ensure that calculated parameter maps are close to their baseline values.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qidiff --baseline=original.nii --input=calculated.nii --noise=0.01 --tolerance=30
+</code></pre>
+
+<p>The program simply returns <code>FAILURE</code> or <code>SUCCESS</code>, which is detected by BATS. Note, to make useage clearer, unlike most other QUIT programs all input is specified as arguments.</p>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--baseline</code></p>
+<p>The baseline image. Required.</p>
+</li>
+<li>
+<p><code>--image</code></p>
+<p>The image to compare to the baseline. Required.</p>
+</li>
+<li>
+<p><code>--noise</code></p>
+<p>The added noise level.</p>
+</li>
+<li>
+<p><code>--tolerance</code></p>
+<p>The tolerance is relative to the added noise level (i.e. it is a noise amplification factor).</p>
+</li>
+<li>
+<p><code>--abs, -a</code></p>
+<p>Use absolute difference instead of fractional difference (i.e. do not divide by the baseline image). Useful when images contain genuine zeros (e.g. off resonance maps).</p>
+</li>
+</ul>
+<h2 id="qinewimage">qinewimage</h2>
+<p>Creates new images filled with specified patterns. Used for generating test data.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qinewimage --size 32,32,32 --grad &quot;0 0.5 1.5&quot; output_image.nii.gz
+</code></pre>
+
+<p>The file specified on the command line is the <em>output</em> file.</p>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--dims, -d</code></p>
+<p>The output dimension. Valid values are 3 and 4.</p>
+</li>
+<li>
+<p><code>--size, -s</code></p>
+<p>Matrix size of the output image.</p>
+</li>
+<li>
+<p><code>--fill, -f</code></p>
+<p>Set all voxels in the image to the specified value.</p>
+</li>
+<li>
+<p><code>--grad, -g "DIM,LOW,HIGH"</code></p>
+<p>Fill voxels with a gradient along the specified dimension, starting at the low value at one edge and finishing at the high value on the other. It is recommended to encase <code>DIM,LOW,HIGH</code> with quotation marks as they must be passed as a single string to be interpreted properly.</p>
+</li>
+<li>
+<p>`--step, -t "DIM,LOW,HIGH,STEPS"</p>
+<p>Similar to <code>--grad</code>, but instead of a smooth gradient will with a number of discrete steps.</p>
+</li>
+<li>
+<p><code>--wrap, -w</code></p>
+<p>Wrap output voxels at the specified value. Useful for simulating phase data.</p>
+</li>
+</ul>
+<h2 id="qisignal">qisignal</h2>
+<p>Generates simulated images using signal equations. Used for the QUIT tests - which will also serve as good examples if you want to use this tool.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qisignal --noise=0.01 simulated_spgr_image.nii.gz &lt; input.txt
+</code></pre>
+
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+    &quot;PD&quot;: &quot;pd.nii&quot;,
+    &quot;T1&quot;: &quot;t1.nii&quot;,
+    &quot;T2&quot;: &quot;&quot;,
+    &quot;f0&quot;: &quot;&quot;,
+    &quot;B1&quot;: &quot;&quot;,
+    &quot;SequenceGroup&quot;: {
+        &quot;sequences&quot;: [
+            {
+                &quot;SPGR&quot;: {
+                    &quot;TR&quot;: 0.05,
+                    &quot;FA&quot;: [3, 10]
+                }
+            }
+        ]
+    }
+}
+</code></pre>
+
+<p>The first set of inputs are the filenames for each parameter. Each model will have a different set of parameters. If a filename is not specified, a default value will be used in each voxel. After the parameters comes a <code>SequenceGroup</code> input, the sequences within must correspond to the image filenames given on the command line.</p>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--ref, -r</code></p>
+<p>Resample the input parameters to this space, then simulate and output the images instead of using the parameter's native space.</p>
+</li>
+<li>
+<p><code>--noise, -n</code></p>
+<p>Add complex-valued Gaussian noise with specified FWHM to the output.</p>
+</li>
+<li>
+<p><code>--model, -M</code></p>
+<p>Specify the model to use to generate the images. At the moment, the models that can be specified are <code>1</code>, <code>2</code> &amp; <code>3</code>, corresponding to single-component (default), the two component mcDESPOT model and the three component mcDESPOT model. If you change the model then the required input parameter files will also change (see <code>qi_mcd.bats</code> for examples).</p>
+</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2018 Tobias Wood tobias.wood@kcl.ac.uk</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/require.js"></script>
+        <script src="../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>

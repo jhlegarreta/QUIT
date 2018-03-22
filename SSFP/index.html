@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>SSFP - QUIT</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">QUIT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../Relaxometry/">Relaxometry</a>
+</li>
+                            
+<li class="active">
+    <a href="./">SSFP</a>
+</li>
+                            
+<li >
+    <a href="../MT/">Magnetization Transfer</a>
+</li>
+                            
+<li >
+    <a href="../Perfusion/">Perfusion</a>
+</li>
+                            
+<li >
+    <a href="../Susceptibility/">Susceptibility</a>
+</li>
+                            
+<li >
+    <a href="../Stats/">Statistics</a>
+</li>
+                            
+<li >
+    <a href="../Utilities/">Utilities</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../Developer/">Developer</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../Relaxometry/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../MT/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/spinicist/quit/edit/master/docs/SSFP.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#ssfp">SSFP</a></li>
+            <li><a href="#qi_ssfp_bands">qi_ssfp_bands</a></li>
+            <li><a href="#qi_ssfp_ellipse">qi_ssfp_ellipse</a></li>
+            <li><a href="#qi_ssfp_planet">qi_ssfp_planet</a></li>
+            <li><a href="#qi_ssfp_emt">qi_ssfp_emt</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="ssfp">SSFP</h1>
+<p>The Steady-State Free-Precession (SSFP), or more precisely balanced-SSFP (bSSFP), sequence is one of the oldest NMR sequences and can be used to give high SNR MR images with mixed T1/T2 contrast in very short scan time. However, it suffers from banding artefacts in areas of off-resonance which limit its clinical applicability. This module contains a tool for removing those banding artefacts, and then further tools for quantitative mapping using the ellipse signal model.</p>
+<ul>
+<li><a href="#qi_ssfp_bands">qi_ssfp_bands</a></li>
+<li><a href="#qi_ssfp_ellipse">qi_ssfp_ellipse</a></li>
+<li><a href="#qi_ssfp_relax">qi_ssfp_planet</a></li>
+<li><a href="#qi_ssfp_emt">qi_ssfp_emt</a></li>
+</ul>
+<h2 id="qi_ssfp_bands">qi_ssfp_bands</h2>
+<p>There are several different methods for removing SSFP bands in the literature. Most of them rely on acquiring multiple SSFP images with different phase-increments (also called phase-cycling or phase-cycling patterns). Changing the phase-increments moves the bands to a different location, after which the images can be combined to reduce the banding. The different approaches are discussed further below, but the recommended method is the Geometric Solution which requires complex data.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qissfpbands ssfp.nii.gz --method=G --2pass --magnitude
+</code></pre>
+
+<p>The SSFP file must be complex-valued to use the Geometric Solution or Complex Average methods. For the other methods magnitude data is sufficient. Phase-increments should be in opposing pairs, e.g. 180 &amp; 0 degrees, 90 &amp; 270 degrees. These should either be ordered in two blocks, e.g. 180, 90, 0, 270, or alternating, e.g. 180, 0, 90, 270.</p>
+<p><strong>Outputs</strong></p>
+<p>The output filename is the input filename with a suffix that will depend on the method selected (see below).</p>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--method</code></p>
+<p>Choose the band removal method. Choices are:</p>
+<ul>
+<li><code>G</code> Geometric solution. Suffix will be <code>GSL</code> or <code>GSM</code></li>
+<li><code>X</code> Complex Average. Suffix will be <code>CS</code> (for Complex Solution)</li>
+<li><code>R</code> Root-mean-square. Suffix will be <code>RMS</code></li>
+<li><code>M</code> Maximum of magnitudes. Suffix will be <code>Max</code></li>
+<li><code>N</code> Mean of magnitudes. Suffix will be <code>MagMean</code></li>
+</ul>
+</li>
+<li>
+<p><code>--regularise</code></p>
+<p>The Geometric Solution requires regularisation in noisy areas. Available methods are:</p>
+<ul>
+<li><code>M</code> Magnitude regularisation as in original paper</li>
+<li><code>L</code> Line regularisation (unpublished)</li>
+<li><code>N</code> None</li>
+</ul>
+<p>The default is <code>L</code>. If <code>L</code> or <code>M</code> are selected, then that character will be appended to the suffix.</p>
+</li>
+<li>
+<p><code>--2pass, -2</code></p>
+<p>Apply the second-pass energy-minimisation filter from the original paper. Can be likened to smoothing the phase data. If selected will append <code>2</code> to the suffix.</p>
+</li>
+<li>
+<p><code>--alt-order</code></p>
+<p>Phase-increments alternate, e.g. 180, 0, 90, 270. The default is the opposite (two blocks), e.g. 180, 90, 0, 270.</p>
+</li>
+<li>
+<p><code>--ph-incs</code></p>
+<p>Number of phase-increments. The default is 4. If you have multiple phase-increments and (for example) multiple flip-angles, <code>qissfpbands</code> can process them all in one pass.</p>
+</li>
+<li>
+<p><code>--ph-order</code></p>
+<p>The data order is phase-increment varying fastest, flip-angle slowest. The default is the opposite.</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21056">Geometric Solution</a></li>
+</ul>
+<h2 id="qi_ssfp_ellipse">qi_ssfp_ellipse</h2>
+<p>The most important result of Xiang &amp; Hoff's Geometric Solution paper was that the SSFP signal equation can be expressed as an ellipse in the complex-plane. Shcherbakova built on this and showed it was possible to recover the ellipse parameters <script type="math/tex">G, a, b</script> from at least six phase-increments. They then proceeded it was possible to recover <script type="math/tex">T_1 & T_2</script> from the ellipse parameters. This utility calculates the ellipse parameters, and <code>qi_ssfp_planet</code> then processes those parameters to calculate <script type="math/tex">T_1 & \T_2</script>
+</p>
+<p><img alt="SSFP Ellipse Parameters" src="../ellipse.png" /></p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_ssfp_ellipse ssfp_data.nii.gz &lt; input.txt
+</code></pre>
+
+<p>The SSFP file must be complex-valued. At least three pairs of opposing phase-increments are recommended (six images in total).</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>ES_G</code> - The Geometric Solution point of the ellipse. Influences the overall size of the ellipse. This is called <script type="math/tex">M</script> in the Hoff and Shcherbakova papers, but it is not a measurable magnetization and hence to distinguish it a different letter is used.</li>
+<li><code>ES_a</code> - The ellipse parameter that along with <script type="math/tex">G</script> controls the ellipse size.</li>
+<li><code>ES_b</code> - The ellipse parameter that determines how flat or circular the ellipse is.</li>
+<li><code>ES_theta_0</code> - The accrued phase due to off-resonance (divide by <script type="math/tex">2\pi TE\=\pi TR</script> to find the off-resonance frequency).</li>
+<li><code>ES_phi_rf</code> - The effective phase of the RF pulse.</li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--algo, -a</code></p>
+<p>There are two available methods for calculating the ellipse parameters</p>
+<ul>
+<li><code>h</code> Hyper-Ellipse method, similar to that used in the Shcherbakova paper. Can fail when <script type="math/tex">\alpha</script> falls below the Ernst angle, where there is an inversion of the ellipse properties.</li>
+<li><code>d</code> Direct non-linear fitting of the data, which does not suffer the above properties. The default.</li>
+</ul>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21056">PLANET</a></li>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21705">Hyper-Ellipse</a></li>
+</ul>
+<h2 id="qi_ssfp_planet">qi_ssfp_planet</h2>
+<p>Converts the SSFP Ellipse parameters into relaxation times.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_ssfp_planet ES_G.nii.gz ES_a.nii.gz ES_b.nii.gz
+</code></pre>
+
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>PLANET_T1.nii.gz</code> - Longitudinal relaxation time</li>
+<li><code>PLANET_T2.nii.gz</code> - Transverse relaxation time</li>
+<li><code>PLANET_PD.nii.gz</code> - Apparent Proton Density</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21056">PLANET</a></li>
+</ul>
+<h2 id="qi_ssfp_emt">qi_ssfp_emt</h2>
+<p>Due to the short <script type="math/tex">TR</script> commonly used with SSFP, at high flip-angles the sequence becomes MT weighted. It is hence possible to extract qMT parameters from SSFP data. More details will be in a forthcoming paper.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_ssfp_emt ES_G.nii.gz ES_a.nii.gz ES_b.nii.gz
+</code></pre>
+
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>EMT_T1f.nii.gz</code> - Longitudinal relaxation time of the free water bool</li>
+<li><code>EMT_T2f.nii.gz</code> - Transverse relaxation time of the free water pool</li>
+<li><code>EMT_M0.nii.gz</code> - Apparent Proton Density</li>
+<li><code>EMT_F.nii.gz</code>- Bound pool fraction</li>
+<li><code>EMT_kf.nii.gz</code> - Forward exchange rate</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21056">Bieri et al</a></li>
+<li><a href="http://doi.wiley.com/10.1002/mrm.21705">Gloor et al</a></li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2018 Tobias Wood tobias.wood@kcl.ac.uk</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/require.js"></script>
+        <script src="../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Perfusion - QUIT</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">QUIT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../Relaxometry/">Relaxometry</a>
+</li>
+                            
+<li >
+    <a href="../SSFP/">SSFP</a>
+</li>
+                            
+<li >
+    <a href="../MT/">Magnetization Transfer</a>
+</li>
+                            
+<li class="active">
+    <a href="./">Perfusion</a>
+</li>
+                            
+<li >
+    <a href="../Susceptibility/">Susceptibility</a>
+</li>
+                            
+<li >
+    <a href="../Stats/">Statistics</a>
+</li>
+                            
+<li >
+    <a href="../Utilities/">Utilities</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../Developer/">Developer</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../MT/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../Susceptibility/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/spinicist/quit/edit/master/docs/Perfusion.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#perfusion">Perfusion</a></li>
+            <li><a href="#qi_asl">qi_asl</a></li>
+            <li><a href="#qi_ase_oef">qi_ase_oef</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="perfusion">Perfusion</h1>
+<p>Perfusion is the study of blood flow within the brain. This module contains tools to calculate Cerebral Blood Flow (CBF) and the Oxygen Extraction Fraction (OEF).</p>
+<p>The following programs are available:</p>
+<ul>
+<li><a href="#qi_asl">qi_asl</a></li>
+<li><a href="#qi_ase_oef">qi_ase_oef</a></li>
+</ul>
+<h2 id="qi_asl">qi_asl</h2>
+<p>This program implements the standard equation to calculate CBF from either Continuous or pseudo-Continuous Arterial Spin Labelling data (CASL or pCASL). For the exact equation used, see the first reference below.</p>
+<p><img alt="CBF Map" src="../cbf.png" /></p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_asl asl_file.nii.gz --blood=2.429 --alpha=0.9 --average --slicetime --pd=reference_file.nii.gz &lt;input.txt
+</code></pre>
+
+<p>The input file must contain pairs of label &amp; control volumes. Currently the order of these is hard-coded to label, then control. The file can contain multiple pairs if you are studying timeseries data. The arguments are discussed further below. It is highly recommended to provide either a separated Proton Density reference image or a tissue T1 map.</p>
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+    &quot;CASL&quot; : {
+        &quot;TR&quot; : 4.0,
+        &quot;label_time&quot; : 3.0,
+        &quot;post_label_delay&quot; : [ 0.3, 0.6, 0.9 ]
+    }
+}
+</code></pre>
+
+<p>The units for all these values must be consistent, seconds are preferred. If single-slice or 3D data was acquired, then <code>post_label_delay</code> should contain a single value. For multi-slice data, specify the <code>--slicetime</code> option and then provide the effective post-labelling delay for each slice.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li>input_CBF - The CBF value, given in mL/(100 g)/min</li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--blood, -b</code></p>
+<p>The T1 value of blood at the field strength used. The default value is 1.65 seconds, corresponding to 3T. For 1.5T the value should be 1.35 seconds and at 9.4T it should 2.429 seconds. See reference 2.</p>
+</li>
+<li>
+<p><code>--pd, -p</code></p>
+<p>Provide a separate image to estimate of the Proton Density of tissue. If this is not provided, the label images are used instead.</p>
+</li>
+<li>
+<p><code>--tissue, -t</code></p>
+<p>Provide a T1 map to correct the Proton Density estimate. If a separate PD reference is not given, then an alternative is to correct the label images for incomplete T1 relaxation.</p>
+</li>
+<li>
+<p><code>--alpha, -a</code></p>
+<p>The labelling efficiency of the sequence.</p>
+</li>
+<li>
+<p><code>--lambda, -l</code></p>
+<p>The blood-brain partition co-efficient, default 0.9 mL/g.</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://doi.org/10.1016/j.neuroimage.2016.11.057">ISMRM Consortium Recommendations</a></li>
+<li><a href="http://dx.doi.org/10.1016/j.mri.2006.10.020">High-field blood T1 times</a></li>
+</ul>
+<h2 id="qi_ase_oef">qi_ase_oef</h2>
+<p>Estimates the Oxygen Extraction Fraction (OEF) from Asymmetric Spin-Echo (ASE) data. If the signal evolution each side of a spin-echo in the presence of blood vessels is observed carefully, it does not display simple monoexponential T2<em> decay close to the echo, but is instead quadratically exponential. By measuring the T2</em> decay in the linear regime using an ASE sequence, it is possible to extrapolate back to the echo and obtain an estimate of what the signal would be if no blood was presence. The difference between this and the observed signal can be attributed to the Deoxygenated Blood Volume (DBV), and from there the OEF can be calculated.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_ase_oef ase_file.nii.gz --B0=9.4 $DB --fmap=fieldmap.nii.gz &lt;input.txt
+</code></pre>
+
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+  &quot;MultiEcho&quot; : {
+    &quot;TR&quot; : 2.0,
+    &quot;TE1&quot; : 0,
+    &quot;ESP&quot; : 0.002,
+    &quot;ETL&quot; : 10
+  }
+}
+</code></pre>
+
+<p><code>TR</code> must be provided but is not used in the calculation. Echo-times below the critical time (Tc) will be excluded from the R2' calculation.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>input_R2prime.nii.gz</code> The R2' map. Units are the same as those used for <code>TR</code>, <code>TE1</code> and <code>ESP</code>.</li>
+<li><code>input_DBV.nii.gz</code> The Deoxygenated Blood Volume, in percent.</li>
+<li><code>input_OEF.nii.gz</code> The Oxygen Extraction Fraction, in percent.</li>
+<li><code>input_dHb.nii.gz</code> The Deoxyhaemoglobin concentration.</li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--B0, -b</code></p>
+<p>Field-strength the data was acquired at. This is used to calculate Tc and appears elsewhere in several equations.</p>
+</li>
+<li>
+<p><code>--fmap, -f</code></p>
+<p>Provide a field-map (in Hertz). This will be used to provide first-order correction of Macroscopic Field Gradients (MFGs). If this option is specified, the derivative of the field-map in all 3 directions will also be saved.</p>
+</li>
+<li>
+<p><code>--slice,-s</code></p>
+<p>If the data was acquired with a slice-gap, use this option to specify the actual slice-thickness for the MFG calculation.</p>
+</li>
+</ul>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://doi.org/10.1016/j.neuroimage.2016.11.057">Blockley</a></li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2018 Tobias Wood tobias.wood@kcl.ac.uk</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/require.js"></script>
+        <script src="../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>

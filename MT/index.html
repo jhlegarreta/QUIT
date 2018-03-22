@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Magnetization Transfer - QUIT</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">QUIT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../Relaxometry/">Relaxometry</a>
+</li>
+                            
+<li >
+    <a href="../SSFP/">SSFP</a>
+</li>
+                            
+<li class="active">
+    <a href="./">Magnetization Transfer</a>
+</li>
+                            
+<li >
+    <a href="../Perfusion/">Perfusion</a>
+</li>
+                            
+<li >
+    <a href="../Susceptibility/">Susceptibility</a>
+</li>
+                            
+<li >
+    <a href="../Stats/">Statistics</a>
+</li>
+                            
+<li >
+    <a href="../Utilities/">Utilities</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../Developer/">Developer</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../SSFP/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../Perfusion/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/spinicist/quit/edit/master/docs/MT.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#magnetization-transfer">Magnetization Transfer</a></li>
+            <li><a href="#qi_lorentzian">qi_lorentzian</a></li>
+            <li><a href="#qi_mtasym">qi_mtasym</a></li>
+            <li><a href="#qi_dipolar_mtr">qi_dipolar_mtr</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="magnetization-transfer">Magnetization Transfer</h1>
+<p>MR voxels often contain complex microstructure with multiple different components or pools, each with unique relaxation properties. It is possible for magnetization to be transferred between these pools via several mechanisms, such as exchange of individual protons or entire molecules, or simple dipolar coupling from molecules that are in close proximity. These mechanisms can be studied in the related fields of Magnetization Transfer (MT) and Chemical Exchange Saturation Transfer (CEST). QUIT currently contains some basic CEST analysis tools and one for calculating simple dipolar/inhomogeneous MT ratios.</p>
+<p>In addition a tool is provided for calculating qMT parameters from SSFP data. This is in the <a href="../SSFP/">SSFP</a> module.</p>
+<ul>
+<li><a href="#qi_lorentzian">qi_lorentzian</a></li>
+<li><a href="#qi_mtasym">qi_mtasym</a></li>
+<li><a href="#qi_dipolar_mtr">qi_dipolar_mtr</a></li>
+</ul>
+<h2 id="qi_lorentzian">qi_lorentzian</h2>
+<p>Fits a single Lorentzian to a Z-spectrum for B0 correction. Currently hard-coded to only fit the spectrum between +/-2ppm to avoid background MT contamination.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_lorentzian zspectrum.nii.gz &lt; input.txt
+</code></pre>
+
+<p>The Z-spectrum must be a 4D file with each volume acquired at a different offset frequency.</p>
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+    &quot;freq&quot; : [ -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+}
+</code></pre>
+
+<p>These are the offset frequencies for each volume in the Z-spectrum input.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>LTZ_f0.nii.gz</code>  - The center frequency of the fitted Lorentzian.</li>
+<li><code>LTZ_w.nii.gz</code>   - The width of the fitted Lorentzian.</li>
+<li><code>LTZ_sat.nii.gz</code> - The saturation ratio of the fitted Lorentzian.</li>
+<li><code>LTZ_PD.nii.gz</code>  - The apparent Proton Density of the fitted Lorentzian.</li>
+</ul>
+<h2 id="qi_mtasym">qi_mtasym</h2>
+<p>Calculates the MT asymmetry of a Z-spectrum.</p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_mtasym zspectrum.nii.gz --f0=LTZ_f0.nii.gz &lt; input.txt
+</code></pre>
+
+<p>The off-resonance map units must match the input frequencies (e.g. either PPM or Hertz)</p>
+<p><strong>Example Input File</strong></p>
+<pre><code class="json">{
+    &quot;freq&quot; : [ -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
+    &quot;asym_freq&quot; : [-3, -2]
+}
+</code></pre>
+
+<p><code>freq</code> is the offset frequencies the Z-spectrum was acquired at. <code>asym_freq</code> are the frequencies you want the asymmetry calculated at.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>MT_asymmetry.nii.gz</code> The asymmetry value at each asymmetry frequency.</li>
+</ul>
+<p><strong>Important Options</strong></p>
+<ul>
+<li>
+<p><code>--f0, -f</code></p>
+<p>Specify an off-resonance map. Units must be the same as the input &amp; asymmetry frequencies.</p>
+</li>
+</ul>
+<h2 id="qi_dipolar_mtr">qi_dipolar_mtr</h2>
+<p>Calculates dipolar/inhomogeneous Magnetization Transfer Ratios (MTRs). Dipolar/inhomogeneous MT is a new (see note) contrast mechanism that is present in highly structured materials such as myelin and tendon. By applying off-resonance saturation at both positive and negative frequencies (instead of only one side as in classic MTR) it is possible to decouple the dipolar pool and hence produce an enhanced Magnetization Transfer (eMT) effect. The different between eMT and normal MT is the dipolar/inhomogeneous MT and is potentially highly specific to myelin within the brain.</p>
+<p>Although the majority of the existing literature refers to this effect as inhomogeneous MT, this name was chosen before the physical phenomena underlying the effect was well understood. Current theory does not rely on inhomogeneous effects at all, so the name is a misnomer.</p>
+<p><em>Note - The original ihMT abstracts are from around 2005. There was 10 years between the conference abstracts and the corresponding full papers. So the method is not that new</em></p>
+<p><strong>Example Command Line</strong></p>
+<pre><code class="bash">qi_dipolar_mtr dipolar_mt_volumes.nii.gz
+</code></pre>
+
+<p>The input must consist of 5 volumes: Dipolar +/-, Dipolar -/+, Unsaturated, MT+, MT-. This scheme is not flexible and will be improved in a future version.</p>
+<p><strong>Outputs</strong></p>
+<ul>
+<li><code>DMT_mtr.nii.gz</code> - The classic MTR, expressed as a percentage</li>
+<li><code>DMT_emtr.nii.gz</code> - The enhanced MTR, expressed as a percentage</li>
+<li><code>DMT_dmtr.nii.gz</code> - The dipolar MTR, expressed as a percentage. This is the difference between eMTR and MTR.</li>
+<li><code>DMT_mta.nii.gz</code> - The first-order MT-asymmetry (MT- subtracted from MT+, relative to unsaturated, in percent).</li>
+</ul>
+<p><strong>References</strong></p>
+<ol>
+<li><a href="http://doi.wiley.com/10.1002/mrm.25174">Original full paper</a></li>
+<li><a href="https://doi.org/10.1016/j.jmr.2016.11.013">Dipolar versus inhomogeneous naming</a></li>
+</ol></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2018 Tobias Wood tobias.wood@kcl.ac.uk</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script src="../js/base.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../search/require.js"></script>
+        <script src="../search/search.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </body>
+</html>
