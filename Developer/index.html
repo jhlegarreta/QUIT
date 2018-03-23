@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        
+        <link rel="canonical" href="https://spinicist.github.io/QUIT/Developer/">
         <link rel="shortcut icon" href="../img/favicon.ico">
         <title>Developer - QUIT</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -103,7 +103,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/spinicist/quit/edit/master/docs/Developer.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                        <a href="https://github.com/spinicist/QUIT/edit/master/docs/Developer.md"><i class="fa fa-github"></i> Edit on GitHub</a>
                     </li>
             </ul>
         </div>
@@ -114,6 +114,11 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#developer">Developer</a></li>
+            <li><a href="#basic-requirements">Basic Requirements</a></li>
+            <li><a href="#external-libraries">External Libraries</a></li>
+            <li><a href="#compilation">Compilation</a></li>
+            <li><a href="#file-formats">File Formats</a></li>
+            <li><a href="#tests">Tests</a></li>
             <li><a href="#the-applyalgorithmfilter">The ApplyAlgorithmFilter</a></li>
             <li><a href="#example-qidespot1">Example: qidespot1</a></li>
     </ul>
@@ -121,8 +126,15 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="developer">Developer</h1>
-<p>Below are a few introductory notes for anyone who might be interested in contributing to QUIT. Although I hope that most QUIT code is fairly clear, the following is provided to give a high-level overview of how most QUIT programs are structured.</p>
-<p>QUIT is built using several C++ libraries. These are:</p>
+<p>Below are a few introductory notes for anyone who wants to compile QUIT from source or might be interested in contributing to QUIT. Although I hope that most QUIT code is fairly clear, the following is provided to give a high-level overview of how most QUIT programs are structured.</p>
+<h2 id="basic-requirements">Basic Requirements</h2>
+<ol>
+<li>A C++11 compliant compiler (GCC 4.8.0+, Clang 3.1+)</li>
+<li>CMake version 3.2 or higher (http://www.cmake.org)</li>
+</ol>
+<p>WARNING - You will require a recent compiler for DESPOT as it uses C++11 features. GCC 4.8.0 is a MINIMUM as earlier versions do not support C++11 threads - however you will not be able to build the <code>Stats</code> module without GCC 5.0.0 or later. Clang 3.1 will also work. You can find out the version of your system gcc by running <code>gcc -v</code>.</p>
+<h2 id="external-libraries">External Libraries</h2>
+<p>QUIT is built using several C++ libraries. These are currently included in the project as git submodules. The easiest way to initialise these is with the <code>easy_build.sh</code> script. However, if you are already have some of them available you may wish to not run the script and instead configure them yourself. This is discussed further below. The libraries are:</p>
 <ul>
 <li>
 <p><a href="http://github.com/taywee/args">Args</a></p>
@@ -145,6 +157,21 @@
 <p>The Insight Tool-Kit. This is intended as a registration library for medical images. Although the registration features are not used in QUIT, the overall framework is extremely useful. In particular, ITK reads a large variety of common file-formats, and all ITK filters automatically check that their inputs share a common space / co-ordinate definition. This single feature alone prevents the vast majority of easy user mistakes - e.g. trying to use a B1 map that has a different voxel spacing to the input data.</p>
 </li>
 </ul>
+<h2 id="compilation">Compilation</h2>
+<p>If you are unfamiliar with C++/CMake/git etc. a script is provided that should be able to build the tools provided the right software is available on your system. To use it, in a terminal window, change directory to where you unpacked QUIT. Then type <code>./easy_build.sh</code>. This should correctly checkout the git repositories for each external library, build Ceres and ITK, and then configure and build QUIT.</p>
+<p>If you are familiar with C++/CMake/git etc. then compiling QUIT should be straightforward. The rough steps are:</p>
+<ol>
+<li>Ensure you have all the libraries above available. If you do not have system versions, then run <code>git submodule init; git submodule update</code> in the QUIT directory.</li>
+<li>Compile the Ceres library. Make sure it uses the same version of Eigen that you will use for QUIT.</li>
+<li>Compile ITK following their instructions.</li>
+<li>Create a build directory for QUIT and use cmake/ccmake to configure the project. Specify the paths to the library when prompted. It is likely that CMake will report an error on the first 'Configure' attempt if it cannot locate Eigen, specify the correct directory and run the configure step again.</li>
+<li>Compile QUIT.</li>
+</ol>
+<h2 id="file-formats">File Formats</h2>
+<p>The available file formats are controlled by the main <code>CMakeLists.txt</code> in the root QUIT directory, by listing them as <code>COMPONENTS</code> in the ITK <code>find_package()</code> step. Add any additional file formats you wish to use here.s</p>
+<h2 id="tests">Tests</h2>
+<p>QUIT programs are tested using the Bash Automated Test System <a href="http://github.com/bats-core/bats-core">(BATS)</a>, which is included as a git submodule. To run the tests, point BATS at the Tests directory, e.g. <code>path/to/bats QUIT/Test</code>, which will run all of the tests. It is possible to run the test files individually as well. It was decided to use BATS instead of a unit-test based framework because this allows the QUIT programs to be tested as a whole, including command-line arguments.</p>
+<p>Most QUIT programs are tested by generating ground-truth parameter files with <code>qinewimage</code>, feeding these into <code>qisignal</code> to generate simulated MR images with added noise, and then running the particular QUIT program to calculate some parameter maps, then comparing these to the ground-truth with <code>qidiff</code>. <code>qidiff</code> calculates figure-of-merit based on noise factors, i.e. they are a measure of how much the signal noise is amplified in the final maps. In this way the tests also serve to illustrate the quality of the methods as well as whether the programs run correctly. For programs where a ground-truth image cannot be generated easily, the tests at least ensure that the program runs and does not crash.</p>
 <h2 id="the-applyalgorithmfilter">The ApplyAlgorithmFilter</h2>
 <p>The core part of QUIT is the <code>ApplyAlgorithmFilter</code> and its child-class <code>Algorithm</code>, found in <code>/Source/Filters/</code>. This is a sub-class of the ITK <code>ImageToImageFilter</code>. The vast majority of QUIT programs declare an <code>Algorithm</code> sub-class and use this to process the data. <code>ApplyAlgorithmFilter</code> abstracts out most of the heavy lifting of extracting voxel-wise data from multiple inputs and writing it out to multiple outputs, leaving the <code>Algorithm</code> to process a single-voxel.</p>
 <p>An <code>Algorithm</code> defines the number of expected inputs and their size, the number of 'constants' or fixed-parameters, and the number of outputs. It would be preferable if <code>Algorithm</code> also defined the types of these, and then <code>Algorithm</code> was passed as a template-type to <code>ApplyAlgorithmFilter</code>, e.g. <code>ApplyAlgorithmFilter&lt;DESPOT1Algorithm&gt;</code>. However, due to an <code>itk::Image&lt;itk::VariableLengthVector, 3&gt;</code> being different to an <code>itk::VectorImage&lt;float, 3&gt;</code> this is not possible. Instead, <code>ApplyAlgorithmFilter</code> takes the input and output types as template parameters, and defines a child-class that has these types available to it. It is these child-classes that developers should sub-class. Several are predefined in the <code>ApplyTypes.h</code> file.</p>

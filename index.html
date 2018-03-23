@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="Documentation for the QUantitative Imaging Tools">
         
-        
+        <link rel="canonical" href="https://spinicist.github.io/QUIT/">
         <link rel="shortcut icon" href="./img/favicon.ico">
         <title>QUIT</title>
         <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
@@ -103,7 +103,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/spinicist/quit/edit/master/docs/index.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                        <a href="https://github.com/spinicist/QUIT/edit/master/docs/index.md"><i class="fa fa-github"></i> Edit on GitHub</a>
                     </li>
             </ul>
         </div>
@@ -115,6 +115,7 @@
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#welcome">Welcome</a></li>
             <li><a href="#installation">Installation</a></li>
+            <li><a href="#compile-from-source">Compile From Source</a></li>
             <li><a href="#general-usage">General Usage</a></li>
             <li><a href="#file-formats">File Formats</a></li>
             <li><a href="#scripting">Scripting</a></li>
@@ -135,16 +136,9 @@
 <li><a href="Utilities/">Utilities</a></li>
 </ul>
 <h2 id="installation">Installation</h2>
-<p><strong>Binary Installation</strong></p>
-<p>Compiled binaries are provided for Mac and Linux and can be found on the github releases page. These are provided in both tar (<code>.tar.gz</code>) and self-extracting tar (<code>.sh</code>) formats.</p>
-<p>If you download the self-extracting tar version, the following command should install QUIT correctly:</p>
-<pre><code class="bash">sudo ./QUIT-2.0.0-Darwin.sh --prefix=/usr/local --exclude-subdir
-</code></pre>
-
-<p>If you download the <code>.tar.gz</code> version, you will need to copy the files to the correct locations. The usual location is <code>/usr/local</code>, however it is possible to locate them somewhere else. Ensure that the libraries (in /lib) are somewhere that the system can find them. On Mac, this means the directory with the libraries must be contained in the <code>DLYD_LIBRARY_PATH</code> environment variable.</p>
-<p><strong>Compile From Source</strong></p>
-<p>Compiling QUIT requires a recent version of CMake and a C++11 compatible compiler (GCC 5 or higher is recommended). If you have cloned the git repository and are compiling from source, it is recommended to run the <code>easy_build.sh</code> script the first time. This will ensure the external libraries required have been initialised properly and that the main QUIT build is pointed at them.</p>
-<p>If you wish to customise your build, then the standard <code>mkdir build &amp;&amp; cd build &amp;&amp; ccmake ../</code> approach will work, but you will have to tell <code>cmake</code> where to find the external libraries (Args, Cereal, Eigen, Ceres &amp; ITK). These are included as git submodules, but Ceres and ITK will require compilation first.</p>
+<p>Compiled binaries are provided for Mac and Linux and can be found on the github releases page. These are provided in <code>.tar.gz</code> archive. After extraction, you need to ensure that the binaries are accessible via your <code>PATH</code> variable. Either edit your shell profile (e.g. <code>.bashrc</code>) and add the QUIT directory your <code>PATH</code> variable there, or copy the files to somewhere that will be on your path, e.g. <code>/usr/local/bin</code> (this will likely require <code>sudo</code> permissions).</p>
+<h2 id="compile-from-source">Compile From Source</h2>
+<p>See the <a href="Developer/">developer documentation</a></p>
 <h2 id="general-usage">General Usage</h2>
 <p>QUIT programs take their input as a combination of command-line arguments and text files passed to <code>stdin</code>. If you run a QUIT program with no arguments then will see a message like this:</p>
 <pre><code class="bash">~: qidespot1
@@ -203,7 +197,8 @@ SPGR FILE was not specified. Use --help to see usage.
 
 <p>then (provided your input data does contain two volumes corresponding to flip-angles 3 and 18 degrees) then DESPOT1 will run, and you should see two files created (<code>D1_T1.nii.gz</code> and <code>D1_PD.nii.gz</code>). If you want to see what the programs are doing while running, specify the <code>--verbose</code> or <code>-v</code> options.</p>
 <h2 id="file-formats">File Formats</h2>
-<p>Because QUIT uses the <a href="http://itk.org">ITK</a> library, it can read a wide variety of file-formats, including DICOM &amp; NRRD. The preferred file-format is NIFTI for compatibility with FSL and SPM. By default QUIT will output <code>.nii.gz</code> files. This can be controlled by the <code>QUIT_EXT</code> environment variable. Valid values for this are any file extension that ITK can write, e.g. <code>.nii</code> or <code>.nrrd</code>, or the FSL values <code>NIFTI</code>, <code>NIFTI_PAIR</code>, <code>NIFTI_GZ</code>, <code>NIFTI_PAIR_GZ</code>. Note that ITK cannot write every format it can read (e.g. it can read Bruker 2dseq datasets, but it cannot write them).</p>
+<p>By default, QUIT is compiled with support for NIFTI and NRRD formats. The preferred file-format is NIFTI for compatibility with FSL and SPM. By default QUIT will output <code>.nii.gz</code> files. This can be controlled by the <code>QUIT_EXT</code> environment variable. Valid values for this are any file extension supported by ITK that QUIT has been compiled to support, e.g. <code>.nii</code> or <code>.nrrd</code>, or the FSL values <code>NIFTI</code>, <code>NIFTI_PAIR</code>, <code>NIFTI_GZ</code>, <code>NIFTI_PAIR_GZ</code>.</p>
+<p>The <a href="http://itk.org">ITK</a> library supports a much wider variety of file formats, but adding support for all of these almost triples the size of the compiled binaries. Hence by default they are excluded. You can add support for more file formats by compiling QUIT yourself, see the <a href="Developer/">developer documentation</a>. Note that ITK cannot write every format it can read (e.g. it can read Bruker 2dseq datasets, but it cannot write them).</p>
 <h2 id="scripting">Scripting</h2>
 <p>The QUIT tools are designed to be used inside shell scripts or SGE jobs. 3 scripts are provided along with the binaries. <code>qi_composer.sh</code> uses the <code>qi_coil_combine</code> program to correctly combine complex data from multiple element RF coils. <code>qi_example_mcd_b1.sh</code> and <code>qi_example_mcd_hifi.sh</code> give example mcDESPOT processing pipelines. The first assumes that you have a good B1 map and have already registered all the input volumes to a common reference. The second shows one of doing this using FSL. Registration is beyond the scope of QUIT, so you must have additional tools installed for this.</p></div>
         </div>
@@ -289,5 +284,5 @@ SPGR FILE was not specified. Use --help to see usage.
 
 <!--
 MkDocs version : 0.17.3
-Build Date UTC : 2018-03-22 21:39:47
+Build Date UTC : 2018-03-23 21:43:13
 -->
